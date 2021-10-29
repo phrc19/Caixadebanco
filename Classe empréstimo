@@ -1,0 +1,37 @@
+package banco1;
+
+
+public class Emprestimo {
+    private int QtdParcelas;
+    private double ValorParcela;
+    private int codigoConta;
+    private int agenciaConta;
+
+    public int getQtdParcelas() {
+        return QtdParcelas;
+    }
+
+    public double getValorParcela() {
+        return ValorParcela;
+    }
+
+    public int getCodigoConta() {
+        return codigoConta;
+    }
+
+    public int getAgenciaConta() {
+        return agenciaConta;
+    }
+
+    public Emprestimo (int QtdParcelas, double ValorParcela, int codigoConta, int agenciaConta){
+        this.QtdParcelas = QtdParcelas;
+        this.ValorParcela = ValorParcela;
+        this.agenciaConta = agenciaConta;
+        this.codigoConta = codigoConta;
+    }
+    
+    @Override
+    public String toString() {
+        return "";
+    }
+}

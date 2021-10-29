@@ -1,0 +1,60 @@
+package banco1;
+
+import java.util.LinkedList;
+
+public class Conta {
+    private String Nome;
+    private int Codigo;
+    private int Agencia;
+    private float SaldoInicial = 0;
+    private float SaldoFinal;
+    
+    public String getNome(){
+        return Nome;
+    }
+   
+    public int getCodigo(){
+        return Codigo;
+    }
+    
+    public int getAgencia(){
+        return Agencia;
+    } 
+
+    public float getSaldoInicial() {
+        return SaldoInicial;
+    }
+
+    public float getSaldoFinal() {
+        return SaldoFinal;
+    }
+    
+    
+    public void AdicionaDinheiro(float SaldoFim, float valor){
+        SaldoInicial = SaldoFinal;
+        SaldoFinal = SaldoInicial + valor;
+    }
+    
+    
+    public void TransfereValor(float SaldoFim, float valor){
+        SaldoFinal -= valor;
+    }
+    
+
+    public Conta (String Nome, int Codigo, int Agencia, float Saldo){
+        this.Nome = Nome;
+        this.Codigo = Codigo;
+        this.Agencia = Agencia;
+        this.SaldoInicial = SaldoInicial;
+        this.SaldoFinal = SaldoFinal;
+    }
+    
+    @Override
+    public String toString() {
+        System.out.println("Código da conta: " + Codigo);
+        System.out.println("Agencia da Conta: " + Agencia);
+        System.out.println("Nome do Cliente Dono: " + Nome);
+        System.out.println("Saldo da Conta: " + SaldoFinal);
+        return "";
+    }
+}

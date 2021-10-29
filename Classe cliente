@@ -1,0 +1,62 @@
+package banco1;
+
+public class Cliente {
+    private String Nome;
+    private Conta Conta;
+    private String Endereco;
+    private int Senha;
+    private String SenhaFinal;
+    private String Senhaaa;
+    private float LimiteCredito;
+    private float NovoLimite = 0;
+
+    public String getNome(){
+        return Nome;
+    }
+   
+    public Conta getConta(){
+        return Conta;
+    }
+    
+    public String getEndereco(){
+        return Endereco;
+    } 
+
+    public int getSenha() {
+        return Senha;
+    }
+
+    public float getLimiteCredito() {
+        return LimiteCredito;
+    }
+
+    public float getNovoLimite() {
+        return NovoLimite;
+    }
+
+    public void setNovoLimite(float NovoLimite) {
+        this.NovoLimite = NovoLimite;
+    }
+    
+    public Cliente (String Nome, Conta Conta, String Endereco, int Senha, float LimiteCredito){
+        this.Nome = Nome;
+        this.Conta = Conta;
+        this.Endereco = Endereco;
+        this.Senha = Senha;
+        this.LimiteCredito = LimiteCredito;
+        SenhaFinal = Integer.toString(Senha);
+        Senhaaa = SenhaFinal.replace("1", "*").replace("2","*").replace("3","*").replace("4","*").replace("5","*").replace("6","*").replace("7","*").replace("8","*").replace("9","*").replace("0","*");
+    }
+    
+    @Override
+    public String toString() {
+        System.out.println("Conta: " + Conta.getCodigo());
+        System.out.println("Agencia da Conta: " + Conta.getAgencia());
+        System.out.println("Nome do Cliente: " + Nome);
+        System.out.println("Saldo da Conta: R$ " + Conta.getSaldoFinal());
+        System.out.println("Endereço do Cliente: " + Endereco);
+        System.out.println("Senha: " + Senhaaa + " (Senha Digitada Anteriormente)");
+        System.out.println("O seu Limite de Emprestimo é de: R$ " + LimiteCredito);
+        return "";
+    }
+}

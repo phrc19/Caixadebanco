@@ -1,0 +1,52 @@
+package banco1;
+
+import java.text.DecimalFormat;
+
+public class Transacao {
+    private float TipoDebito;
+    private float TipoCredito;
+    private String HoraData;
+    private int codigo;
+    private float SaldoInicial;
+    private float SaldoFinal;
+    DecimalFormat format = new DecimalFormat("0.00");
+    
+
+    public String getHoraData() {
+        return HoraData;
+    }
+    
+    public float getTipoDebito(){
+        return TipoDebito;
+    }
+
+    public float getTipoCredito() {
+        return TipoCredito;
+    }
+
+    public int getCodigo() {
+        return codigo;
+    }
+    
+    public Transacao (float TipoDebito, float TipoCredito, String HoraData, int codigo, float SaldoInicial, float SaldoFinal){
+        this.HoraData = HoraData;
+        this.TipoDebito = TipoDebito;
+        this.TipoCredito = TipoCredito;
+        this.codigo = codigo;
+        this.SaldoInicial = SaldoInicial;
+        this.SaldoFinal = SaldoFinal;
+    }
+    
+    @Override
+    public String toString() {
+        System.out.println("Saldo da Conta Antes: R$ " + format.format(SaldoInicial));
+        System.out.println("Conta que foi adicionada: " + codigo);
+        System.out.println("Data e Hora: " + HoraData );
+        System.out.println("Valor Adicionado: R$ " + format.format(TipoDebito));
+        System.out.println("Valor Retirado: R$ " + format.format(TipoCredito));
+        System.out.println("Saldo da Conta Depois: R$ " + format.format(SaldoFinal));
+        return "";
+    }
+    
+    
+}

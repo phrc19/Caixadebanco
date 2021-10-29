@@ -1,0 +1,502 @@
+package banco1;
+
+import java.awt.AWTException;
+import java.awt.Robot;
+import java.awt.event.KeyEvent;
+import java.text.DecimalFormat;
+import java.util.Scanner;
+import java.util.LinkedList;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+public class Menu {
+
+    public static void main(String[] args) {
+        Scanner teclado  = new Scanner(System.in);
+        LinkedList<Conta> conta = new LinkedList<Conta>();
+        LinkedList<Cliente> cliente = new LinkedList<Cliente>();
+        LinkedList<Transacao> depositos = new LinkedList<Transacao>();
+        LinkedList<Emprestimo> emp = new LinkedList<Emprestimo>();
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+        DecimalFormat format = new DecimalFormat("0.00"); 
+        float saldo = 0;
+        int opcao;
+
+        do {
+            System.out.println("\n Bem vindo do Banco Paulo Hugo Rothechedl Cavalieri - MENU");
+            System.out.println("---------------------------");
+            System.out.println("1 - Cadastrar Conta"); 
+            System.out.println("2 - Cadastrar Cliente");
+            System.out.println("3 - Creditar Valor");
+            System.out.println("4 - Debitar Valor");
+            System.out.println("5 - Emitir Saldo  ");
+            System.out.println("6 - Emitir Extrato");
+            System.out.println("7 - Sair");
+            System.out.println("---------------------------");
+            System.out.println("opção:");
+            opcao = teclado.nextInt();
+
+            switch (opcao) {
+                case 1:
+                    limparSaida();
+                    System.out.println("Opção de Cadastrar Conta Selecionada\n");
+                    System.out.println("Digite o Nome do Cliente Dono:");
+                    String Nome = teclado.next();
+                    System.out.println("\nDigite o Código da Conta:\n");
+                    int Codigo = teclado.nextInt();
+                    System.out.println("\nDigite a Agencia da Conta:\n");
+                    int Agencia = teclado.nextInt();
+                    Conta ListaConta = new Conta(Nome, Codigo, Agencia, saldo);
+                    conta.add(ListaConta);
+                    System.out.println("Conta Criada com Sucesso");
+                    break;
+                case 2:
+                    limparSaida();
+                    if (!conta.isEmpty()) {
+                        System.out.println("\nDigite a Conta do Cliente:\n");
+                        int CodigoConta = teclado.nextInt();
+                        for (int i = 0; i < conta.size(); i++) {
+                            if (conta.get(i).getCodigo() == CodigoConta) {
+                                String NomeCliente = conta.get(i).getNome();
+                                System.out.println("Digite o Endereço do Cliente: \n");
+                                String Endereco = teclado.next();
+                                System.out.println("Digite uma nova Senha de 4 digitos para a Conta: \n");
+                                int SenhaConta = teclado.nextInt();
+                                
+                                float LimiteCredito = 1000;    
+                                Cliente ListaCliente = new Cliente(NomeCliente, conta.get(i), Endereco, SenhaConta, LimiteCredito);
+                                cliente.add(ListaCliente);
+                                System.out.println("Cliente Adicionado com Sucesso.");
+                            }
+                        }
+                        for (int i = 0; i < cliente.size(); i++) {
+                            System.out.println("");
+                            System.out.println(cliente.get(i));
+                            System.out.println(" ");
+                        }
+                        break;
+                    } else {
+                        System.out.println("Não existe contas cadastradas");
+                        break;
+                    }
+                case 3:
+                    limparSaida();
+                    if (!cliente.isEmpty()) {
+                        do {
+                            System.out.println("---------------------------");
+                            System.out.println("1 - Depositar\n");
+                            System.out.println("2 - Transferir\n");
+                            System.out.println("3 - Empréstimo\n");
+                            System.out.println("4 - Sair\n");
+                            System.out.println("---------------------------");
+                            System.out.println("opção:");
+                            opcao = teclado.nextInt();
+                            switch (opcao) {
+                                case 1:
+                                    limparSaida();
+                                    System.out.println("Digite a conta do cliente: ");
+                                    int ContaDeposito = teclado.nextInt();
+                                    System.out.println("Digite a Agencia da conta: ");
+                                    int AgenciaDeposito = teclado.nextInt();
+                                    for (int i = 0; i < conta.size(); i++) {
+                                        if ((conta.get(i).getCodigo() == ContaDeposito) && (conta.get(i).getAgencia() == AgenciaDeposito)) {
+                                            System.out.println("Digite o Valor a ser Depositado: ");
+                                            float saldoDeposito = teclado.nextFloat();
+                                            conta.get(i).AdicionaDinheiro(conta.get(i).getSaldoInicial(), saldoDeposito);
+                                            System.out.println("\nAdicionado: " + saldoDeposito + "\nData e Hora -> " + dtf.format(LocalDateTime.now()));
+                                            String HoraData = dtf.format(LocalDateTime.now());
+                                                    Transacao contaTransacaoDeposito = new Transacao(saldoDeposito, 0, HoraData, conta.get(i).getCodigo(), conta.get(i).getSaldoInicial(), conta.get(i).getSaldoFinal());
+                                                    depositos.add(contaTransacaoDeposito);
+                                                    System.out.println("\nDeposito Realizado com Sucesso.");
+                                                    break;
+                                                }
+                                            }
+                                    break;
+                                case 2:
+                                    limparSaida();
+                                    System.out.println("Deseja transferir para o mesmo banco? (Sim/Nao)");
+                                    String Resposta = teclado.next();
+                                    if (Resposta.equals("Sim")){
+                                        System.out.println("Digite o Numero da sua Conta: ");
+                                        int ContaInicial = teclado.nextInt();
+                                        System.out.println("Digite a Agencia da sua Conta: ");
+                                        int AgenciaInicial = teclado.nextInt();
+                                        for (int i = 0; i < conta.size(); i++) {
+                                            if ((conta.get(i).getCodigo() == ContaInicial) && (conta.get(i).getAgencia() == AgenciaInicial)) {
+                                                System.out.println("Digite a Quantidade a ser Transferida: ");
+                                                float QtdTransferida = teclado.nextFloat();
+                                                if (QtdTransferida > conta.get(i).getSaldoFinal()){
+                                                    System.out.println("\nSaldo Insuficiente.");
+                                                } else {
+                                                System.out.println("Digite o Numero da Conta a ser transferida: ");
+                                                int ContaFinal = teclado.nextInt();
+                                                System.out.println("Digite a Agencia da Conta a ser transferida: ");
+                                                int AgenciaFinal = teclado.nextInt();
+         
+                                                
+                                                for (int j = 0; j < cliente.size(); j++) {
+                                                if ((conta.get(j).getCodigo() == ContaFinal) && (conta.get(j).getAgencia() == AgenciaFinal)) {
+                                                    conta.get(i).TransfereValor(conta.get(i).getSaldoFinal(), QtdTransferida);
+                                                    conta.get(j).AdicionaDinheiro(conta.get(j).getSaldoFinal(), QtdTransferida);
+                                                   
+                                                    String HoraDataTransf = dtf.format(LocalDateTime.now());
+                                          
+                                                    Transacao ContaTransacaoTransf = new Transacao (0, QtdTransferida, HoraDataTransf, conta.get(i).getCodigo(), (conta.get(i).getSaldoFinal() + QtdTransferida), conta.get(i).getSaldoFinal()); 
+                                                    Transacao ContaTransacaoDep = new Transacao (QtdTransferida, 0, HoraDataTransf, conta.get(j).getCodigo(), (conta.get(j).getSaldoFinal() - QtdTransferida), conta.get(j).getSaldoFinal());
+                                                    depositos.add(ContaTransacaoTransf);
+                                                    depositos.add(ContaTransacaoDep);
+                                                    System.out.println("Transferencia Realizada com Sucesso.");
+                                                }   
+                                                }}}}
+                                                
+                                            } else if (Resposta.equals("Nao")){
+                                                System.out.println("Indisponivel transferencia para outros bancos.");
+                                            } else {
+                                            System.out.println("Erro.");
+                                            
+                                    }
+                                    
+                                    for (int i = 0; i < conta.size(); i++) {
+                                    System.out.println(conta.get(i));
+                                    System.out.println(" ");
+                                    }
+                                    break;
+                                case 3:
+                                    limparSaida();
+                                    System.out.println("Digite a conta do cliente: ");
+                                    int ContaSimulacao = teclado.nextInt();
+                                    System.out.println("Digite a Agencia da conta: ");
+                                    int AgenciaSimulacao = teclado.nextInt();
+                                    for (int i = 0; i < conta.size(); i++) {
+                                        if (conta.get(i).getCodigo() == ContaSimulacao && conta.get(i).getAgencia() == AgenciaSimulacao) {
+                                            for (int j=0;j<cliente.size();j++){
+                                                    if (cliente.get(j).getConta().getCodigo() == ContaSimulacao){
+                                                        
+                                                    float LimiteEmprestimo = cliente.get(j).getLimiteCredito() - cliente.get(j).getNovoLimite();
+       
+                                                    System.out.println("Seu limite disponivel para Empréstimo é o valor do seu limite disponivel no Crédito: R$ " + LimiteEmprestimo);
+                                                    System.out.println("Deseja continuar? (Sim ou Nao)");
+                                                    String RespostaSim = teclado.next();
+                                                    if (RespostaSim.equals("Sim")){
+                                                        System.out.println("Digite o valor desejavel para o Empréstimo: ");
+                                                        float ValorEmp = teclado.nextFloat();
+                                                        if (ValorEmp > LimiteEmprestimo){
+                                                            System.out.println("Valor não disponivel. Vá até uma Agencia Bancária.");
+                                                            break;
+                                                        } else {
+                                                            System.out.println("O valor está disponivel.");
+                                                            System.out.println("1 - 2 vezes de " + format.format((ValorEmp/2)*(1.24)));
+                                                            System.out.println("2 - 3 vezes de " + format.format((ValorEmp/3)*(1.24)));
+                                                            System.out.println("3 - 4 vezes de " + format.format((ValorEmp/4)*(1.24)));
+                                                            System.out.println("4 - 5 vezes de " + format.format((ValorEmp/5)*(1.24)));
+                                                            System.out.println("5 - 6 vezes de " + format.format((ValorEmp/6)*(1.24)));
+                                                            System.out.println("Selecione a opção com a parcela que mais se adequa no seu bolso: ");
+                                                            int Respost = teclado.nextInt();
+                                                            if (Respost == 1){
+                                                                System.out.println("Confirma o Empréstimo de: " + ValorEmp + " Com as parcelas: 2 vezes de " + format.format(((ValorEmp/2)*(1.24))));
+                                                                System.out.println("Digite Sim ou Nao:");
+                                                                String Confirma = teclado.next();
+                                                                if (Confirma.equals("Sim")){
+                                                                    System.out.println("Digite a Sua senha: ");
+                                                                    int SenhaEmp = teclado.nextInt();
+                                                                    if (SenhaEmp == cliente.get(j).getSenha()){
+                                                                        cliente.get(j).getConta().AdicionaDinheiro(cliente.get(j).getConta().getSaldoFinal(), ValorEmp);
+                                                                        String HoraDataEmp = dtf.format(LocalDateTime.now());
+                                                                        Transacao ContaTransacaoEmp = new Transacao (ValorEmp, 0 , HoraDataEmp, conta.get(i).getCodigo(),conta.get(i).getSaldoInicial(), conta.get(i).getSaldoFinal()); 
+                                                                        depositos.add(ContaTransacaoEmp);
+                                                                        cliente.get(j).setNovoLimite(ValorEmp);
+                                                                        double valordaparc = ((ValorEmp/2)*(1.24));
+                                                                        Emprestimo emprestimo = new Emprestimo(2,valordaparc,ContaSimulacao, AgenciaSimulacao);
+                                                                        emp.add(emprestimo);
+                                                                        System.out.println("Emprestimo Realizado com Sucesso");
+                                                                    } else {
+                                                                        System.out.println("Senha Incorreta. Tente Novamente");
+                                                                    }
+                                                                    
+                                                                } else if (Confirma.equals("Nao")){
+                                                                    System.out.println("Operação cancelada");
+                                                                    break;
+                                                                } else {
+                                                                    System.out.println("Erro. Tente Novamente.");
+                                                                    break;
+                                                                }
+                                                                
+                                                            } else if (Respost == 2){
+                                                                System.out.println("Confirma o Empréstimo de: " + ValorEmp + " Com as parcelas: 3 vezes de " + format.format(((ValorEmp/3)*(1.24))));
+                                                                System.out.println("Digite Sim ou Nao:");
+                                                                String Confirma = teclado.next();
+                                                                if (Confirma.equals("Sim")){
+                                                                    System.out.println("Digite a Sua senha: ");
+                                                                    int SenhaEmp = teclado.nextInt();
+                                                                    if (SenhaEmp == cliente.get(j).getSenha()){
+                                                                        cliente.get(j).getConta().AdicionaDinheiro(cliente.get(j).getConta().getSaldoFinal(), ValorEmp);
+                                                                        String HoraDataEmp = dtf.format(LocalDateTime.now());
+                                                                        Transacao ContaTransacaoEmp = new Transacao (ValorEmp, 0 , HoraDataEmp, conta.get(i).getCodigo(),conta.get(i).getSaldoInicial(), conta.get(i).getSaldoFinal()); 
+                                                                        depositos.add(ContaTransacaoEmp);
+                                                                        double valordaparc = ((ValorEmp/3)*(1.24));
+                                                                        Emprestimo emprestimo = new Emprestimo(3,valordaparc,ContaSimulacao, AgenciaSimulacao);
+                                                                        emp.add(emprestimo);
+                                                                        System.out.println("Emprestimo Realizado com Sucesso");
+                                                                    } else {
+                                                                        System.out.println("Senha Incorreta. Tente Novamente");
+                                                                    }
+                                                                    
+                                                                } else if (Confirma.equals("Nao")){
+                                                                    System.out.println("Operação cancelada");
+                                                                    break;
+                                                                } else {
+                                                                    System.out.println("Erro. Tente Novamente.");
+                                                                    break;
+                                                                }
+                                                        } else if (Respost == 3){
+                                                            System.out.println("Confirma o Empréstimo de: " + ValorEmp + " Com as parcelas: 4 vezes de " + format.format(((ValorEmp/4)*(1.24))));
+                                                                System.out.println("Digite Sim ou Nao:");
+                                                                String Confirma = teclado.next();
+                                                                if (Confirma.equals("Sim")){
+                                                                    System.out.println("Digite a Sua senha: ");
+                                                                    int SenhaEmp = teclado.nextInt();
+                                                                    if (SenhaEmp == cliente.get(j).getSenha()){
+                                                                        cliente.get(j).getConta().AdicionaDinheiro(cliente.get(j).getConta().getSaldoFinal(), ValorEmp);
+                                                                        String HoraDataEmp = dtf.format(LocalDateTime.now());
+                                                                        Transacao ContaTransacaoEmp = new Transacao (ValorEmp, 0 , HoraDataEmp, conta.get(i).getCodigo(),conta.get(i).getSaldoInicial(), conta.get(i).getSaldoFinal()); 
+                                                                        depositos.add(ContaTransacaoEmp);
+                                                                        double valordaparc = ((ValorEmp/4)*(1.24));
+                                                                        Emprestimo emprestimo = new Emprestimo(4,valordaparc,ContaSimulacao, AgenciaSimulacao);
+                                                                        emp.add(emprestimo);
+                                                                        System.out.println("Emprestimo Realizado com Sucesso");
+                                                                    } else {
+                                                                        System.out.println("Senha Incorreta. Tente Novamente");
+                                                                    }
+                                                                    
+                                                                } else if (Confirma.equals("Nao")){
+                                                                    System.out.println("Operação cancelada");
+                                                                    break;
+                                                                } else {
+                                                                    System.out.println("Erro. Tente Novamente.");
+                                                                    break;
+                                                                }
+                                                        } else if (Respost == 4){
+                                                            System.out.println("Confirma o Empréstimo de: " + ValorEmp + " Com as parcelas: 5 vezes de " + format.format(((ValorEmp/5)*(1.24))));
+                                                                System.out.println("Digite Sim ou Nao:");
+                                                                String Confirma = teclado.next();
+                                                                if (Confirma.equals("Sim")){
+                                                                    System.out.println("Digite a Sua senha: ");
+                                                                    int SenhaEmp = teclado.nextInt();
+                                                                    if (SenhaEmp == cliente.get(j).getSenha()){
+                                                                        cliente.get(j).getConta().AdicionaDinheiro(cliente.get(j).getConta().getSaldoFinal(), ValorEmp);
+                                                                        String HoraDataEmp = dtf.format(LocalDateTime.now());
+                                                                        Transacao ContaTransacaoEmp = new Transacao (ValorEmp, 0 , HoraDataEmp, conta.get(i).getCodigo(),conta.get(i).getSaldoInicial(), conta.get(i).getSaldoFinal()); 
+                                                                        depositos.add(ContaTransacaoEmp);
+                                                                        double valordaparc = ((ValorEmp/5)*(1.24));
+                                                                        Emprestimo emprestimo = new Emprestimo(5,valordaparc,ContaSimulacao, AgenciaSimulacao);
+                                                                        emp.add(emprestimo);
+                                                                        System.out.println("Emprestimo Realizado com Sucesso");
+                                                                    } else {
+                                                                        System.out.println("Senha Incorreta. Tente Novamente");
+                                                                    }
+                                                                    
+                                                                } else if (Confirma.equals("Nao")){
+                                                                    System.out.println("Operação cancelada");
+                                                                    break;
+                                                                } else {
+                                                                    System.out.println("Erro. Tente Novamente.");
+                                                                    break;
+                                                                }
+                                                        } else if (Respost == 5){
+                                                            System.out.println("Confirma o Empréstimo de: " + ValorEmp + " Com as parcelas: 6 vezes de " + format.format(((ValorEmp/6)*(1.24))));
+                                                                System.out.println("Digite Sim ou Nao:");
+                                                                String Confirma = teclado.next();
+                                                                if (Confirma.equals("Sim")){
+                                                                    System.out.println("Digite a Sua senha: ");
+                                                                    int SenhaEmp = teclado.nextInt();
+                                                                    if (SenhaEmp == cliente.get(j).getSenha()){
+                                                                        cliente.get(j).getConta().AdicionaDinheiro(cliente.get(j).getConta().getSaldoFinal(), ValorEmp);
+                                                                        String HoraDataEmp = dtf.format(LocalDateTime.now());
+                                                                        Transacao ContaTransacaoEmp = new Transacao (ValorEmp, 0 , HoraDataEmp, conta.get(i).getCodigo(),conta.get(i).getSaldoInicial(), conta.get(i).getSaldoFinal());
+                                                                        depositos.add(ContaTransacaoEmp);
+                                                                        double valordaparc = ((ValorEmp/6)*(1.24));
+                                                                        Emprestimo emprestimo = new Emprestimo(6,valordaparc,ContaSimulacao, AgenciaSimulacao);
+                                                                        emp.add(emprestimo);
+                                                                        System.out.println("Emprestimo Realizado com Sucesso");
+                                                                    } else {
+                                                                        System.out.println("Senha Incorreta. Tente Novamente");
+                                                                    }
+                                                                } else if (Confirma.equals("Nao")){
+                                                                    System.out.println("Operação cancelada");
+                                                                    break;
+                                                                } else {
+                                                                    System.out.println("Não entendi. Tente Novamente.");
+                                                                    break;
+                                                                }
+                                                        } else {
+                                                                System.out.println("Não entendi. Tente Novamente");
+                                                                break;
+                                                        }
+                                                }
+                                                    } else if (RespostaSim.equals("Nao")){
+                                                        break;
+                                                    } else {
+                                                        System.out.println("Não entendi. Tente Novamente");
+                                                        break;
+                                                }
+                                                    
+                                                }
+                                            }
+                          
+                                        }}
+                                    break;
+                                case 4:
+                                    break;
+                            }
+                        } while (opcao != 4);
+                        opcao = 0;
+                    } else {
+                        System.out.println("Nenhum Cliente Cadastrado.");
+                    }
+                    break;
+                case 4:
+                    limparSaida();
+                    if (!cliente.isEmpty()) {
+                        do {
+                            System.out.println("---------------------------");
+                            System.out.println("1 - Saque\n");
+                            System.out.println("2 - Pagar Emprestimo\n");
+                            System.out.println("3 - Sair\n"); 
+                            System.out.println("---------------------------");
+                            System.out.println("opção:");
+                            opcao = teclado.nextInt();
+                            switch (opcao) {
+                                case 1:
+                                    limparSaida();
+                                    System.out.println("Digite a conta do cliente: ");
+                                    int ContaSaque = teclado.nextInt();
+                                    System.out.println("Digite a Agencia da conta: ");
+                                    int AgenciaSaque = teclado.nextInt();
+                                    for (int i = 0; i < conta.size(); i++) {
+                                        if (conta.get(i).getCodigo() == ContaSaque && conta.get(i).getAgencia() == AgenciaSaque) {
+                                            System.out.println("Digite o valor a ser sacado:");
+                                            float ValorSaque = teclado.nextFloat();
+                                            if (ValorSaque > conta.get(i).getSaldoFinal()){
+                                                System.out.println("Saldo Insuficiente. Tente Novamente");
+                                                break;
+                                            } else {
+                                                System.out.println("Digite a senha do cartão: (4 digitos) ");
+                                                int senhaConfirma = teclado.nextInt();
+                                                for (int j=0;j<cliente.size();j++){
+                                                    if (cliente.get(j).getConta().getCodigo() == ContaSaque){
+                                                        
+                                                        if (cliente.get(j).getSenha() == senhaConfirma){
+                                                    conta.get(i).TransfereValor(conta.get(i).getSaldoFinal(), ValorSaque);
+                                                    
+                                                    String HoraDataSaque = dtf.format(LocalDateTime.now());
+                                                    Transacao ContaSaqueTransf = new Transacao(0, ValorSaque, HoraDataSaque, conta.get(i).getCodigo(), (conta.get(i).getSaldoFinal() + ValorSaque), conta.get(i).getSaldoFinal());
+                                                    depositos.add(ContaSaqueTransf);
+                                                    System.out.println("Saque Feito com Sucesso");
+                                                } else {
+                                                    System.out.println("Senha Invalida. Tente Novamente");
+                                                    break;
+                                                }
+                                                    } 
+                                                    }
+                                            }
+                                    }
+                                    }break;
+                                case 2:
+                                    limparSaida();
+                                    System.out.println("Digite a conta do cliente: ");
+                                    int ContaVerificar = teclado.nextInt();
+                                    System.out.println("Digite a Agencia da conta: ");
+                                    int AgenciaVerificar = teclado.nextInt();
+                                    for (int i = 0; i < emp.size(); i++) {
+                                    if (emp.get(i).getCodigoConta() == ContaVerificar && emp.get(i).getAgenciaConta() == AgenciaVerificar) {
+                                        System.out.println("Deseja pagar a Parcela de: R$ " + format.format(emp.get(i).getValorParcela()) + " (Sim ou Nao)");
+                                        String RespostaPagamento = teclado.next();
+                                        if (RespostaPagamento.equals("Sim")){
+                                            for (int j=0;j<conta.size();j++){
+                                                if (conta.get(j).getCodigo() == ContaVerificar && conta.get(j).getAgencia() == AgenciaVerificar){
+                                                    if(conta.get(j).getSaldoFinal() > emp.get(i).getValorParcela()){
+                                                        float valorp = (float) emp.get(i).getValorParcela();
+                                                        conta.get(j).TransfereValor(conta.get(j).getSaldoFinal(), valorp);
+                                                        String HoraDataPagamento = dtf.format(LocalDateTime.now());
+                                                        Transacao PagamentoEmp = new Transacao(0, valorp, HoraDataPagamento, conta.get(j).getCodigo(), (conta.get(j).getSaldoFinal() + valorp), conta.get(i).getSaldoFinal());
+                                                        depositos.add(PagamentoEmp);
+                                                        System.out.println("Parcela Paga.");
+                                                    } else {
+                                                        System.out.println("Saldo Insuficiente.");
+                                                    }
+                                                }
+                                            }
+                                        } else if (RespostaPagamento.equals("Nao")){
+                                            
+                                        } else {
+                                            System.out.println("ERRO!");
+                                        }
+                                    }}
+                                            
+                                    break;
+                                case 3:
+                                    break;
+                            }
+                        }while (opcao != 3);
+                        opcao = 0;
+                    } else {
+                        System.out.println("Nenhum Cliente Cadastrado.");
+                    }
+                    break;
+                case 5:
+                    limparSaida();
+                    System.out.println("Digite a conta do cliente: ");
+                    int ContaSaldo = teclado.nextInt();
+                    System.out.println("Digite a Agencia da conta: ");
+                    int AgenciaSaldo = teclado.nextInt();
+                    for (int i = 0; i < conta.size(); i++) {
+                    if (conta.get(i).getCodigo() == ContaSaldo && conta.get(i).getAgencia() == AgenciaSaldo) {
+                        System.out.println("\nO Saldo na conta é de: " + conta.get(i).getSaldoFinal());
+                    } else {
+                        System.out.println("\nConta não encontrado na posição: " + (i+1));
+                    }
+                    }
+                    break;
+                case 6:
+                    limparSaida();
+                    System.out.println("Digite a conta do cliente: ");
+                    int ContaExtrato = teclado.nextInt();
+                    System.out.println("Digite a Agencia da conta: ");
+                    int AgenciaExtrato = teclado.nextInt();
+                    for (int i = 0; i < conta.size(); i++) {
+                        if ((conta.get(i).getCodigo() == (ContaExtrato)) && (conta.get(i).getAgencia() == AgenciaExtrato)) {
+                            
+                            for (int j=0;j < depositos.size();j++){
+                                if (depositos.get(j).getCodigo() == ContaExtrato){
+                                    System.out.println(depositos.get(j).toString());
+                                    }
+                                }
+                                }}
+                    break;
+                    
+                case 7:
+                    System.out.println("Desligando....");
+                    try { Thread.sleep (5000); } catch (InterruptedException ex) {}
+                    System.out.println("Até logo!");
+                    System.exit(0);
+                    default:
+                      System.out.println("Opção Inválida!");  
+
+                    break;
+            }
+        } while (opcao != 7);
+        
+    }
+    public final static void limparSaida() {
+        try {
+            Robot robot = new Robot();
+            robot.setAutoDelay(10);
+            robot.keyPress(KeyEvent.VK_CONTROL);
+            robot.keyPress(KeyEvent.VK_L);
+            robot.keyRelease(KeyEvent.VK_CONTROL);
+            robot.keyRelease(KeyEvent.VK_L);
+        } catch (AWTException ex) {
+        }
+    
+}
+}
